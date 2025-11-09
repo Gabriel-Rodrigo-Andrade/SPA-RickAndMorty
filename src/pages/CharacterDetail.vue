@@ -32,7 +32,6 @@ const error = ref(null)
 let controller = null
 
 async function loadCharacter (characterId) {
-  // cancel previous request if any
   if (controller) {
     try { controller.abort() } catch (e) { /* ignore */ }
     controller = null
@@ -46,9 +45,7 @@ async function loadCharacter (characterId) {
     const res = await api.get(`/character/${characterId}`, { signal: controller.signal })
     character.value = res.data
   } catch (err) {
-    // axios when aborted has code 'ERR_CANCELED'
     if (err && (err.code === 'ERR_CANCELED' || err.name === 'CanceledError')) {
-      // request was cancelled, do nothing
       return
     }
     if (err && err.response && err.response.status === 404) {
@@ -65,7 +62,6 @@ onMounted(() => {
   loadCharacter(id.value)
 })
 
-// react when route param changes
 watch(() => route.params.id, (newId) => {
   id.value = newId
   loadCharacter(newId)
@@ -73,7 +69,7 @@ watch(() => route.params.id, (newId) => {
 
 onUnmounted(() => {
   if (controller) {
-    try { controller.abort() } catch (e) { /* ignore */ }
+    try { controller.abort() } catch (e) {}
     controller = null
   }
 })

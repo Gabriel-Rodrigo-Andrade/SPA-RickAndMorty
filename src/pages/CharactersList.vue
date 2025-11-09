@@ -15,16 +15,24 @@
 			</div>
 
 			<div class="load-more" v-if="info && info.next">
-				<button @click="loadMore" :disabled="loadingMore" class="btn-load">
-					<span v-if="!loadingMore">Carregar mais</span>
-					<span v-else>Carregando...</span>
+				<button
+					type="button"
+					@click="loadMore"
+					:disabled="loadingMore"
+					:aria-busy="loadingMore"
+					class="btn-load"
+				>
+					<span class="btn-content">
+						<span v-if="loadingMore" class="spinner" aria-hidden="true"></span>
+						<span class="btn-text">{{ loadingMore ? 'Carregando...' : 'Carregar mais' }}</span>
+					</span>
 				</button>
 			</div>
 	</main>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import api from '../services/api'
 import CharacterCard from '../components/CharacterCard.vue'
 
@@ -51,7 +59,6 @@ async function loadCharacters (opts = { page: 1, append: false }) {
 		info.value = res.data.info || null
 		page.value = currentPage
 	} catch (err) {
-		// Prefer more informative messages when available
 		if (err.response && err.response.data && err.response.data.error) {
 			error.value = err.response.data.error
 		} else {
@@ -67,10 +74,19 @@ onMounted(() => {
 		loadCharacters({ page: 1, append: false })
 })
 
-function loadMore () {
+async function loadMore () {
 	if (!info.value || !info.value.next) return
 	const nextPage = page.value + 1
-	loadCharacters({ page: nextPage, append: true })
+
+	loadingMore.value = true
+
+	await nextTick()
+
+	await new Promise((resolve) => setTimeout(resolve, 2000))
+
+	await loadCharacters({ page: nextPage, append: true })
+
+	loadingMore.value = false
 }
 </script>
 
@@ -81,54 +97,48 @@ function loadMore () {
 	padding: 1rem;
 }
 
-.tittle-container {
-  h1 { font-size: 1.5rem; margin: 0; }
-  p { color: #6b7280; margin-top: 0.25rem; }
+.tittle-container h1 {
+	font-size: 1.5rem;
+	margin: 0;
+	color: var(--text-color);
+}
+.tittle-container p {
+	color: var(--text-muted);
+	margin-top: 0.25rem;
 }
 
-.container-loading, .container-error { 
-  margin-top: 1rem;
+.container-loading,
+.container-error {
+	margin-top: 1rem;
 }
 .container-error {
-  color: #b91c1c;
+	color: var(--error-color);
 }
 
 .cards-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 1.5rem;
-  align-items: stretch;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 14px;
 }
 
-.card-wrapper { 
-  display: flex;
-  align-items: stretch;
+.card-wrapper {
+	width: 100%;
 }
-
-.load-more {
-  margin-top: 1rem;
+@media (min-width: 768px) {
+	.card-wrapper {
+		width: calc(50% - 12px);
+	}
 }
-
-.btn-load {
-	display: inline-block;
-	padding: 0.5rem 1rem;
-	background: #2563eb; /* blue-600 */
-	color: #ffffff;
-	border-radius: 0.375rem;
-	border: none;
-	cursor: pointer;
-}
-
-.btn-load:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+@media (min-width: 992px) {
+	.card-wrapper {
+		width: calc(25% - 12px);
+	}
 }
 
 @media (max-width: 640px) {
-	.cards-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 1024px) {
-  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+	.load-more .btn-load {
+		width: 50%;
+	}
 }
 </style>

@@ -1,52 +1,59 @@
 <template>
-  <router-link :to="`/personagem/${character.id}`" class="card-link">
+  <div class="card-container">
     <article class="card">
       <div class="card-image">
         <img :src="character.image" :alt="character.name" />
+
+        <button
+          class="fav-btn"
+          :class="{ favourited: isFav }"
+          @click.stop.prevent="toggleFav"
+          :aria-pressed="isFav"
+          :title="isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+        >
+          <svg v-if="isFav" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.3l6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.76L5.82 21z"/></svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17.3l6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.76L5.82 21z"/></svg>
+        </button>
       </div>
 
-      <div class="card-body">
+      <router-link :to="`/personagem/${character.id}`" class="card-link">
         <header class="card-header">
           <h3 class="card-title">{{ character.name }}</h3>
-          <p class="card-subtitle">{{ character.species }} <span v-if="character.type">• {{ character.type }}</span></p>
         </header>
-
-        <div class="card-grid">
-          <div>
+        <div class="card-body">
+          <div class="card-row">
+            <p class="card-label">Espécie</p>
+            <p class="card-value">{{ character.species }} <span v-if="character.type">• {{ character.type }}</span></p>
+        </div>
+          <div class="card-row">
             <p class="card-label">Gênero</p>
             <p class="card-value">{{ character.gender }}</p>
           </div>
-          <div>
+          <div class="card-row">
             <p class="card-label">Status</p>
-            <p class="status-row">
+            <p>
               <span :class="['status-badge', statusClassComputed]">{{ character.status }}</span>
             </p>
           </div>
-          <div>
-            <p class="card-label">Origem</p>
-            <p class="card-value">{{ character.origin?.name }}</p>
-          </div>
-          <div>
-            <p class="card-label">Local</p>
-            <p class="card-value">{{ character.location?.name }}</p>
-          </div>
         </div>
-
         <footer class="card-footer">
-          <div class="episodes">Episódios: <span class="episodes-count">{{ episodeCount }}</span></div>
-          <div class="first-ep">{{ firstEpisodeId ? `(1º ep: #${firstEpisodeId})` : '' }}</div>
-        </footer>
-      </div>
+            <div class="episodes">Episódios: <span class="episodes-count">{{ episodeCount }}</span></div>
+            <div class="first-ep">{{ firstEpisodeId ? `(1º ep: #${firstEpisodeId})` : '' }}</div>
+          </footer>
+      </router-link>
     </article>
-  </router-link>
+  </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { useFavoritesStore } from '../stores/favoritesStore'
 
 const props = defineProps({
   character: { type: Object, required: true }
 })
+
+const store = useFavoritesStore()
 
 const episodeCount = computed(() => (props.character.episode ? props.character.episode.length : 0))
 
@@ -63,31 +70,52 @@ const statusClassComputed = computed(() => {
   if (s === 'dead') return 'status-dead'
   return 'status-unknown'
 })
+
+const isFav = computed(() => store.isFavorite(props.character.id))
+
+function toggleFav () {
+  store.toggleFavorite(props.character.id)
+}
 </script>
 
 <style scoped>
-.card-link { display: block; text-decoration: none; }
+.card-link { 
+  width: 100%; 
+  text-decoration: none;
+}
+
+.card-container { 
+  display: flex; 
+  height: 100%; 
+}
+.card-container > .card-link { 
+  display: flex; 
+  flex: 1 1 auto; 
+}
+
 .card {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
+  height: 100%;
   border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), black);
+  color: var(--text-color);
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   transition: transform .15s ease, box-shadow .15s ease;
 }
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
 }
 
 .card-image {
   width: 100%;
-  height: 24rem;
-  background: #f3f4f6; /* gray-100 */
+  height: 16rem;
+  background: linear-gradient(180deg, rgba(163,207,231,0.06), rgba(59,43,37,0.02));
   overflow: hidden;
+  position: relative;
 }
 .card-image img {
   width: 100%;
@@ -96,41 +124,93 @@ const statusClassComputed = computed(() => {
   object-position: center;
   display: block;
 }
+
+.fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  background: rgba(0,0,0,0.45);
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, color .12s ease;
+  z-index: 5;
+}
+.fav-btn:hover {
+  transform: scale(1.05);
+}
+.fav-btn.favourited {
+  background: linear-gradient(90deg, #ffd166, #ffb703);
+  color: #222222;
+  border-color: rgba(0,0,0,0.08);
+}
+
 .card-body {
-  padding: 1rem;
-  flex: 1 1 auto; /* faz o body preencher o espaço e empurra o footer pra baixo*/
+  padding:20px;
+  padding-top: 0%;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
 }
 
-.card-header .card-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827; /* gray-900 */
+.card-header {
+  color: var(--text-color);
   white-space: nowrap;
+  padding: 20px;
+  padding-top: 0%;
+  padding-bottom: 0%;
+}
+
+.card-title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.card-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280; /* gray-500 */
-  margin-top: 0.25rem;
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 10%;
+}
+
+.card-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+
+}
+.card-value {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;    
+  max-width: 100%;
 }
 
-.card-grid {
-  margin-top: 0.75rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #374151; /* gray-700 */
+@media (max-width: 480px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 0.25rem 0.5rem;
+  }
+  .card-grid > div {
+    display: block;
+  }
+  .card-label {
+    grid-column: auto; 
+  }
+  .card-value { 
+    grid-column: auto; 
+    justify-self: start; 
+    text-align: left; 
+  }
 }
-.card-label { font-size: 0.75rem; color: #6b7280; }
-.card-value { font-weight: 500; }
 
 .status-badge {
   display: inline-flex;
@@ -138,24 +218,42 @@ const statusClassComputed = computed(() => {
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
-.status-alive { background: #d1fae5; color: #065f46; }
-.status-dead { background: #fee2e2; color: #991b1b; }
-.status-unknown { background: #f3f4f6; color: #374151; }
-.status-row { margin-top: 0.25rem; }
+.status-alive { 
+  background: rgba(151,206,76,0.12); 
+  color: var(--portal-green); 
+  border: 1px solid rgba(151,206,76,0.18); 
+}
+.status-dead { 
+  background: rgba(255,107,107,0.06); 
+  color: var(--error-color); 
+  border: 1px solid rgba(255,107,107,0.12); 
+}
+.status-unknown { 
+  background: rgba(232,154,199,0.06); 
+  color: var(--accent-pink); 
+  border: 1px solid rgba(232,154,199,0.08); 
+}
 
 .card-footer {
   margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #f3f4f6;
+  padding: 20px;
+  padding-bottom: 5px;
+  padding-top: 5px;
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
 }
-.first-ep { font-size: 0.75rem; color: #6b7280; }
-.episodes-count { font-weight: 600; }
+.first-ep { 
+  font-size: 0.75rem; 
+  color: var(--text-muted); 
+}
+.episodes-count { 
+  font-weight: 700; 
+  color: var(--portal-cyan); 
+}
 </style>
