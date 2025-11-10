@@ -4,16 +4,13 @@
       <div class="card-image">
         <img :src="character.image" :alt="character.name" />
 
-        <button
-          class="fav-btn"
-          :class="{ favourited: isFav }"
-          @click.stop.prevent="toggleFav"
-          :aria-pressed="isFav"
-          :title="isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-        >
+        <button class="fav-btn" :class="{ favourited: isFav, toggled: justToggled }" @click.stop.prevent="toggleFav" :aria-pressed="isFav" :title="isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'">
           <svg v-if="isFav" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.3l6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.76L5.82 21z"/></svg>
           <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17.3l6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.76L5.82 21z"/></svg>
         </button>
+        <transition name="fav-feedback">
+          <span v-if="showFavFeedback" class="fav-feedback">{{ isFav ? 'Adicionado' : 'Removido' }}</span>
+        </transition>
       </div>
 
       <router-link :to="`/personagem/${character.id}`" class="card-link">
@@ -71,10 +68,19 @@ const statusClassComputed = computed(() => {
   return 'status-unknown'
 })
 
+import { ref } from 'vue'
+
 const isFav = computed(() => store.isFavorite(props.character.id))
+
+const showFavFeedback = ref(false)
+const justToggled = ref(false)
 
 function toggleFav () {
   store.toggleFavorite(props.character.id)
+  justToggled.value = true
+  showFavFeedback.value = true
+  setTimeout(() => { justToggled.value = false }, 380)
+  setTimeout(() => { showFavFeedback.value = false }, 900)
 }
 </script>
 
@@ -149,6 +155,41 @@ function toggleFav () {
   background: linear-gradient(90deg, #ffd166, #ffb703);
   color: #222222;
   border-color: rgba(0,0,0,0.08);
+}
+.fav-btn.toggled {
+  animation: fav-pop 360ms cubic-bezier(.2,.9,.2,1);
+}
+
+@keyframes fav-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.18); }
+  60% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.fav-feedback {
+  position: absolute;
+  top: 72px;
+  right: 12px;
+  background: rgba(0,0,0,0.6);
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.fav-feedback-enter-active, .fav-feedback-leave-active {
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.fav-feedback-enter-from, .fav-feedback-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+.fav-feedback-enter-to, .fav-feedback-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .card-body {

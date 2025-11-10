@@ -1,24 +1,26 @@
 <template>
   <HeroBanner />
   <main class="container">
-    <div class="liquid-glass-container">
-      <div class="first-content">
-        <h2>Sobre o Desenho</h2>
-        <p>"Rick and Morty" é uma série de animação de comédia e ficção científica sobre as aventuras interdimensionais do cientista maluco Rick e seu neto Morty. A série é conhecida por misturar humor ácido, referências à cultura pop e explorações de temas filosóficos como niilismo, existencialismo e a indiferença do universo. A dinâmica entre o cínico Rick e seu neto, mais ingênuo, é o cerne da história, que aborda desde a moralidade até a insignificância do indivíduo em um multiverso infinito.</p>
-        <InfoCarousel :items="aboutItems"/>
+    <div class="container-du-krl">
+      <div class="liquid-glass-container">
+        <div class="first-content">
+          <h2>Sobre o Desenho</h2>
+          <p>"Rick and Morty" é uma série de animação de comédia e ficção científica sobre as aventuras interdimensionais do cientista maluco Rick e seu neto Morty. A série é conhecida por misturar humor ácido, referências à cultura pop e explorações de temas filosóficos como niilismo, existencialismo e a indiferença do universo. A dinâmica entre o cínico Rick e seu neto, mais ingênuo, é o cerne da história, que aborda desde a moralidade até a insignificância do indivíduo em um multiverso infinito.</p>
+          <InfoCarousel :items="aboutItems"/>
+        </div>
       </div>
-    </div>
-    <div class="liquid-glass-container">
-      <div class="second-content">
-        <h2>Personagens Em Destaque</h2>
-        <div v-if="loadingFeatured" class="container-loading">Carregando...</div>
-        <div v-else-if="featuredError" class="container-error">Erro: {{ featuredError }}</div>
-        <div v-else>
-          <InfoCarousel>
-          <div class="carousel-item" v-for="char in featuredCharacters" :key="char.id">
-            <CharacterCard :character="char" /> 
+      <div class="liquid-glass-container">
+        <div class="second-content">
+          <h2>Personagens Em Destaque</h2>
+          <div v-if="loadingFeatured" class="container-loading">Carregando...</div>
+          <div v-else-if="featuredError" class="container-error">Erro: {{ featuredError }}</div>
+          <div v-else>
+            <InfoCarousel>
+            <div class="carousel-item" v-for="char in featuredCharacters" :key="char.id">
+              <CharacterCard :character="char" /> 
+            </div>
+            </InfoCarousel>
           </div>
-          </InfoCarousel>
         </div>
       </div>
     </div>
@@ -88,34 +90,28 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
-  margin: 0 auto;
-  padding-left: var(--padding-default, 1rem);
-  padding-right: var(--padding-default, 1rem);
-  box-sizing: border-box;
-}
-
 .liquid-glass-container {
-  box-sizing: border-box;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  height: 100%;
-  border-radius: 0.5rem;
-  background: linear-gradient(1000deg, rgba(255,255,255,0.02), black);
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  padding: 2em;
-  margin-bottom: 2%;
+    box-sizing: border-box;
+    max-width: 1100px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: 100%;
+    border-radius: 0.5rem;
+    background: linear-gradient(1000deg, rgba(255,255,255,0.02), black);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 2em;
+    margin-bottom: 2%;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991px) {
   .container {
     box-sizing: border-box;
     max-width: 100%;
-    padding-left: var(--padding-default, 0.75rem);
-    padding-right: var(--padding-default, 0.75rem);
+    padding-left: var(--padding-default, 1rem);
+    padding-right: var(--padding-default, 1.5rem);
   }
 
   .liquid-glass-container {
@@ -130,7 +126,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .container {
     box-sizing: border-box;
     max-width: 100%;

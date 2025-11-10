@@ -1,31 +1,31 @@
 <template>
   <header class="site-header">
-    <div class="container-header">
+    <div class="container-du-krl">
+      <div class="container-header">
+        <div class="logo-header">
+          <router-link to="/">
+            <img src="../assets/images/lg-ram.png" class="logo-rick" alt="main-logo" />
+          </router-link>
+        </div>
 
-      <div class="logo-header">
-        <router-link to="/">
-          <img src="../assets/images/lg-ram.png" class="logo-rick" alt="main-logo" />
-        </router-link>
+        <button class="menu-toggle" @click="toggleMenu">
+          <span :class="{ open: isMenuOpen }"></span>
+          <span :class="{ open: isMenuOpen }"></span>
+          <span :class="{ open: isMenuOpen }"></span>
+        </button>
+
+        <nav class="menus-header" :class="{ active: isMenuOpen }" aria-label="Main navigation">
+          <router-link to="/" class="nav-link" @click="closeMenu">Home</router-link>
+          <router-link to="/personagens" class="nav-link" @click="closeMenu">Personagens</router-link>
+          <router-link to="/favoritos" class="nav-link" @click="closeMenu">Favoritos</router-link>
+        </nav>
       </div>
-
-      <button class="menu-toggle" @click="toggleMenu">
-        <span :class="{ open: isMenuOpen }"></span>
-        <span :class="{ open: isMenuOpen }"></span>
-        <span :class="{ open: isMenuOpen }"></span>
-      </button>
-
-      <nav class="menus-header" :class="{ active: isMenuOpen }" aria-label="Main navigation">
-        <router-link to="/" class="nav-link" @click="closeMenu">Home</router-link>
-        <router-link to="/personagens" class="nav-link" @click="closeMenu">Personagens</router-link>
-        <router-link to="/favoritos" class="nav-link" @click="closeMenu">Favoritos</router-link>
-      </nav>
     </div>
   </header>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
 
 const isMenuOpen = ref(false)
 
@@ -41,19 +41,29 @@ function closeMenu() {
 <style scoped>
 .site-header {
   background: rgba(0, 0, 0, 0.6);
-  border-bottom: 1px solid #444444;
-  padding: 10px 20px;
+  border-bottom: 1px solid #444;
+  padding: 0.5rem 0; /* apenas vertical */
   position: relative;
   z-index: 50;
 }
 
 .container-header {
-  max-width: 1100px;
+  width: 100%;
+  max-width: var(--container-max-width, 1100px);
   margin: 0 auto;
-  padding: 0 1rem;
+  padding-left: var(--padding-default, 1rem);
+  padding-right: var(--padding-default, 1rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .container-header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 .logo-header {
@@ -61,13 +71,19 @@ function closeMenu() {
   align-items: center;
 }
 .logo-rick {
-  height: 100px;
+  height: 90px;
   width: auto;
   display: block;
   transition: transform 0.2s ease;
 }
 .logo-rick:hover {
   transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+  .logo-rick {
+    height: 60px;
+  }
 }
 
 .menu-toggle {
@@ -115,13 +131,11 @@ function closeMenu() {
   border-radius: 6px;
   transition: all 0.2s ease;
 }
-
 .nav-link:hover {
   background: var(--magma-green);
   color: #ffffff;
   transform: translateY(-1px);
 }
-
 .nav-link.router-link-active {
   color: #ffffff;
   font-weight: 700;
@@ -163,9 +177,10 @@ function closeMenu() {
   }
 }
 
-@media (max-width: 480px) {
-  .logo-rick {
-    height: 60px;
+@media (min-width:992px) {
+  .container-header {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 </style>

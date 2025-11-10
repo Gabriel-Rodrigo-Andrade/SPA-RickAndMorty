@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --magma-green: #6B9B5D;
+  --text-color: #f8f8f8;
+  --text-muted: #cfc6c1;
+  --card-bg: #25273b;
+  --card-border: #651929;
+  --error-color: #ff6b6b;
+  --padding-default: 1rem;
+}
+
+@media (min-width: 640px) and (max-width: 991px) {
+  :root {
+    --padding-default: 1rem;
+  }
+}
+
+@media (min-width: 992px) {
+  :root {
+    --padding-default: 2rem;
+  }
+}
